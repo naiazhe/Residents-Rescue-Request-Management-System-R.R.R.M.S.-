@@ -1,0 +1,64 @@
+# ================================
+# NAGARESCUE — .gitignore
+# Laravel (PHP) + Node.js / React
+# ================================
+
+# ---- Laravel / PHP ----
+/vendor/
+/node_modules/
+/public/hot
+/public/storage
+/storage/*.key
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+
+# ---- Node / Frontend Build ----
+node_modules/
+/public/build
+/public/css
+/public/js
+/public/mix-manifest.json
+dist/
+.vite/
+
+# ---- Database ----
+*.sqlite
+*.sqlite3
+*.db
+
+# ---- OS Artifacts ----
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ---- IDE & Editor ----
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.code-workspace
+
+# ---- Logs & Cache ----
+*.log
+/bootstrap/cache/*.php
+/storage/app/
+!/storage/app/.gitkeep
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/testing/
+/storage/framework/views/
+/storage/logs/

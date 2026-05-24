@@ -1,0 +1,311 @@
+================================================================================
+RESIDENT APP — SESSION PROMPT LOG
+================================================================================
+Project : HCI-Frontend / resident
+Branch  : main
+Model   : Claude Sonnet 4.6
+================================================================================
+
+--------------------------------------------------------------------------------
+PROMPT 01
+--------------------------------------------------------------------------------
+"After asking the Proof of residency it should ask if what type of residency
+he/she is the housholdRole and after it will ask if he want to add a household
+member then it will proceed to setting up the account details. Dont change the UI"
+
+CHANGES MADE:
+- app/uploadDocuments.jsx
+    • Changed router.push('/register') → router.push('/householdRole')
+      so after proof of residency the user goes to Household Role screen.
+
+FLOW AFTER:
+  uploadDocuments → householdRole → (Yes) householdMember → register
+                                  → (No)                  → register
+
+--------------------------------------------------------------------------------
+PROMPT 02
+--------------------------------------------------------------------------------
+"now add the householdConfirm after adding a member"
+
+CHANGES MADE:
+- app/householdMember.jsx
+    • Changed router.push('/register') → router.push('/householdConfirm')
+      after saving a member.
+- app/householdConfirm.jsx
+    • Changed router.push('/uploadDocuments') → router.push('/register')
+      so Next on the confirm screen goes to Account Details.
+
+FLOW AFTER:
+  householdMember → householdConfirm → register
+
+--------------------------------------------------------------------------------
+PROMPT 03
+--------------------------------------------------------------------------------
+"On account details make the logo smaller so the Add photo, Username, Password
+and Confirm password is on the center same with the Create Account button also
+add a back button on the top left same with the Household role, and Proof of
+Residency, add a back button"
+
+CHANGES MADE:
+- app/register.jsx
+    • Removed unused Link import.
+    • Added import for backIcon (assets/icons/back.png).
+    • Added Back button (absolute top-left) above the container.
+- styles/register.js
+    • Shrank logoImg from width:350/height:250 → width:150/height:100.
+    • Added backBtn, backIcon, backText styles.
+- app/householdRole.jsx
+    • Added import for backIcon.
+    • Added Back button above the container.
+- styles/householdRole.js
+    • Added backBtn, backIcon, backText styles.
+- app/uploadDocuments.jsx
+    • Added import for backIcon.
+    • Added Back button above the container.
+- styles/uploadDocuments.js
+    • Added backBtn, backIcon, backText styles.
+
+--------------------------------------------------------------------------------
+PROMPT 04
+--------------------------------------------------------------------------------
+"now add a back button on the householdMember and householdConfirm, And when
+adding on a household member add a add member instead of just a Save member so
+the loop can be done multiple time instead of just adding a 1 member only.
+Also fix the front end of Household Information keep it clean."
+
+CHANGES MADE:
+- app/householdMember.jsx
+    • Added import for backIcon.
+    • Added Back button above the container.
+    • Renamed button label "Save Member" → "Add Member".
+- styles/signup.js
+    • Added backBtn, backIcon, backText styles (shared by householdMember).
+- app/householdConfirm.jsx
+    • Rewrote renderMemberCard to use correct styles:
+      leftBorder, cardContent, row, cell, valueTextBig, valueText, labelText, mainTag.
+- styles/householdConfirm.js
+    • Full rewrite — removed unused/mismatched style names, tightened card
+      spacing, consistent blue border colors.
+
+--------------------------------------------------------------------------------
+PROMPT 05
+--------------------------------------------------------------------------------
+"Inside the householdMember beside or below the add member add a Save Button
+when the user clicked the add member then it will go back to the household
+member to add a new member then if the Save button is clicked then it will go
+to the householdConfirms. So the user can add multiple member"
+
+CHANGES MADE:
+- app/householdMember.jsx
+    • Replaced single handleNext() with:
+        - validate()      — shared validation logic
+        - resetForm()     — clears all fields
+        - handleAddAnother() — validates, resets form, stays on screen
+        - handleSave()    — validates, navigates to /householdConfirm
+    • Replaced single "Add Member" button with a two-button row:
+        - "Add Member" (outline) → handleAddAnother
+        - "Save"       (filled)  → handleSave
+- styles/signup.js
+    • Added btnRow, outlineBtn, outlineBtnText styles.
+
+FLOW AFTER:
+  householdMember --[Add Member]--> householdMember (loop, form cleared)
+                  --[Save]-------> householdConfirm
+
+--------------------------------------------------------------------------------
+PROMPT 06
+--------------------------------------------------------------------------------
+"add a eye icon on password where it password can be viewed and hide"
+
+CHANGES MADE:
+- app/register.jsx
+    • Added showPassword and showConfirmPassword state.
+    • Password field: secureTextEntry={!showPassword} + Show/Hide toggle button.
+    • Confirm Password field: secureTextEntry={!showConfirmPassword} + toggle.
+- styles/register.js
+    • Added eyeBtn and eyeText styles.
+
+NOTE: No vector icon library was installed. Toggle uses "Show" / "Hide" text
+      labels since @expo/vector-icons is not available in this project.
+
+--------------------------------------------------------------------------------
+PROMPT 07
+--------------------------------------------------------------------------------
+"After the Account Details it will go to the home page it will not going to ask
+a Proof of Residency or what. Best approach is that it will send an OTP to the
+cellphone number inputted by the user earlier to confirm that he she is a human
+or a legitimate."
+
+CHANGES MADE:
+- app/otp.jsx  (NEW FILE)
+    • 6-digit OTP input with individual boxes.
+    • Auto-advances to next box on input; backspace returns to previous box.
+    • Filled boxes highlight in blue (#3FA9F5).
+    • 60-second countdown before "Resend OTP" becomes active.
+    • Resend clears form and restarts countdown.
+    • On Verify: router.replace('/home') — cannot go back to OTP screen.
+- styles/otp.js  (NEW FILE)
+    • Styles for OTP screen: otpRow, otpBox, otpBoxFilled, resendRow,
+      verifyBtn, backBtn, etc.
+- app/register.jsx
+    • Changed success handler from router.push('/uploadDocuments')
+      → router.push('/otp').
+
+FLOW AFTER:
+  register → otp → home  (router.replace so back is blocked)
+
+--------------------------------------------------------------------------------
+PROMPT 08
+--------------------------------------------------------------------------------
+"on the profile side add a indicator if this account is verified or unverified
+by the barangay. And also add a indicator if whos family member has a account.
+The logic of this is that the QR code is used so the household member can
+create an account also but not the same with the household head, they can
+create their own account but a lower version of the head. So if that QR code
+or Member Code create an account so the indicator will pop inside the Household
+head member list. So the head can create a qr code so their family member can
+create their own account. So on the household role add a role of household
+member. So if the user click the Register button on the index page it will ask
+first the household role instead of displaying first the user details. So the
+household role first before the signup."
+
+CHANGES MADE:
+- app/index.jsx
+    • Register link changed from href="/signup" → href="/householdRole".
+- app/householdRole.jsx  (FULL REWRITE)
+    • Removed "add household member" card.
+    • Added "Household Member" as a 4th role option with sublabels.
+    • Next button routes:
+        - "Household Member" → /memberCode
+        - Other roles        → /signup
+- styles/householdRole.js
+    • Added radioSublabel, nextBtn, nextBtnText styles.
+- app/memberCode.jsx  (NEW FILE)
+    • Text input to enter the Member Code.
+    • On verify → router.push('/signup').
+- app/addMembersPrompt.jsx  (NEW FILE)
+    • Simple Yes/No card: "Do you want to add a Household Member now?"
+    • Yes → /householdMember | No → /register
+    • Reuses styles/householdRole.js.
+- app/uploadDocuments.jsx
+    • Route changed from /householdRole → /addMembersPrompt.
+- app/profile.jsx
+    • Added isVerified: false to user state.
+    • Added verification badge below name:
+        - Green  "Verified by Barangay"  when isVerified === true
+        - Orange "Pending Verification"  when isVerified === false
+    • Added hasAccount: true/false to each member in state.
+    • Added "Has Account" (green) / "No Account" (gray) pill badge on
+      each member card in the name row.
+    • New members added via modal default to hasAccount: false.
+- styles/profile.js
+    • Added verifiedBadge, verifiedBadgeGreen, verifiedBadgeOrange,
+      verifiedDot, verifiedText styles.
+    • Added accountBadge, accountBadgeActive, accountBadgeNone,
+      accountBadgeText styles.
+- styles/householdRole.js
+    • Added codeInput style (used by memberCode.jsx).
+
+FLOW AFTER:
+  Head/Tenant/Boarder : householdRole → signup → uploadDocuments
+                        → addMembersPrompt → (householdMember → householdConfirm)?
+                        → register → otp → home
+  Household Member    : householdRole → memberCode → signup
+                        → register → otp → home
+
+--------------------------------------------------------------------------------
+PROMPT 09
+--------------------------------------------------------------------------------
+"After selecting a Household role as Household member the member can either
+input a member code or scan the qr code provided by the household head. Then
+that member cannot add a member the logic is that member cannot add a another
+member. So dont display the question of he/she want to add a household member."
+
+CHANGES MADE:
+- app/memberCode.jsx  (FULL REWRITE)
+    • Added two-tab UI: "Enter Code" | "Scan QR Code".
+    • Enter Code tab: existing text input + Verify & Continue button.
+    • Scan QR Code tab:
+        - Uses expo-camera CameraView with onBarcodeScanned.
+        - Camera permission is requested when tab is tapped.
+        - Blue corner-frame overlay to guide the user.
+        - Alert on scan: Rescan / Continue options.
+        - "Tap to Scan Again" button shown after a scan.
+    • On verify: router.push({ pathname: '/signup', params: { isMember: 'true' } })
+- app/signup.jsx
+    • Added import useLocalSearchParams from expo-router.
+    • Added const { isMember } = useLocalSearchParams().
+    • After form submission:
+        - isMember === 'true' → router.push('/register')   (skip docs & member prompt)
+        - otherwise           → router.push('/uploadDocuments')
+- package.json / node_modules
+    • Installed expo-camera (~17.0.10) via npx expo install expo-camera.
+
+--------------------------------------------------------------------------------
+PROMPT 10
+--------------------------------------------------------------------------------
+"Create a Claude.md for this project just inside the resident folder.
+Add other contents of the default claude.md"
+
+CHANGES MADE:
+- CLAUDE.md  (NEW FILE at resident/CLAUDE.md)
+    • Project overview and monorepo context (4 sibling apps).
+    • Full tech stack table with versions and purpose.
+    • Dev commands (npm start, npm run android/ios, npx expo install rule).
+    • Annotated project structure (app/, styles/, components/, assets/).
+    • Registration flow diagrams for both paths.
+    • Key patterns: styling conventions, navigation, back buttons, forms,
+      QR code system, profile indicators.
+    • Household Role logic table.
+    • Assets reference (images + icons mapped to usage).
+    • DO / DON'T rules.
+
+--------------------------------------------------------------------------------
+PROMPT 11
+--------------------------------------------------------------------------------
+"I mean after clicking the Register the selection of household role should
+just a modal"
+
+CHANGES MADE:
+- app/index.jsx
+    • Removed Link import (no longer needed for Register).
+    • Added Modal import.
+    • Added ROLES array (4 roles with value + sublabel).
+    • Added RadioButton component (inline, for the modal).
+    • Added roleModalVisible and selectedRole state.
+    • Register button now opens the modal (setRoleModalVisible(true))
+      instead of navigating away.
+    • Added handleRoleContinue():
+        - Validates selection (Alert if none chosen).
+        - Closes modal.
+        - Routes to /memberCode (Household Member) or /signup (others).
+    • Modal renders as a bottom sheet with:
+        - Drag handle bar.
+        - Title + subtitle.
+        - 4 selectable role cards with radio buttons.
+        - "Continue" (blue) and "Cancel" (gray) buttons.
+- styles/index.js
+    • Added modal styles: modalOverlay, modalSheet, modalHandle,
+      modalTitle, modalSubtitle, roleList, roleOption, roleRadioOuter,
+      roleRadioOuterSelected, roleRadioInner, roleLabel, roleSublabel,
+      modalContinueBtn, modalContinueText, modalCancelBtn, modalCancelText.
+
+NOTE: householdRole.jsx screen still exists but is no longer the entry
+      point from the login screen. The modal replaces that navigation.
+
+--------------------------------------------------------------------------------
+PROMPT 12
+--------------------------------------------------------------------------------
+"Remember that every prompts that I made to this session store it inside a
+text file inside of this resident folder name it prompts.txt So every changes
+and prompts store it inside that text so I can track what prompts and what
+changes youve made with that prompts"
+
+CHANGES MADE:
+- prompts.txt  (THIS FILE — NEW FILE at resident/prompts.txt)
+    • Created and populated with all 12 prompts from this session,
+      each with a summary of every file changed and what was changed.
+
+================================================================================
+END OF LOG
+================================================================================
